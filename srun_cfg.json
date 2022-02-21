@@ -1,0 +1,8 @@
+{
+    "username" : "123456",
+    "password" : "123456",
+    "portal_url" : "http://1.1.1.1/srun_portal_pc?ac_id=9&theme=pro",
+    "ua_type" : "mobile",
+    "gecko_driver" : "geckodriver",
+    "gecko_path" : "firefox"
+}
