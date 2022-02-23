@@ -2,6 +2,7 @@
 from selenium import webdriver
 from selenium.webdriver.firefox.options import Options
 from selenium.webdriver.common.by import By
+from prettytable import PrettyTable
 from shutil import which
 import socket
 import json
@@ -65,22 +66,90 @@ class SrunFireFox:
         time.sleep(1)
         url = self.firefox.current_url
         print(url)
-        # find url "srun_portal" is exist and no "success"
+        # not logged in
         if url.find('srun_portal') != -1 and url.find('success') == -1:
             self.firefox.find_element(By.ID, "username").send_keys(self.cfg['username'])
-            self.firefox.find_element(By.ID, "password").click()
             self.firefox.find_element(By.ID, "password").send_keys(self.cfg['password'])
             self.firefox.find_element(By.ID, "login-account").click()
             # wait for login
             time.sleep(1)
             url = self.firefox.current_url
-            print(url)
-            if url.find('srun_portal') != -1 and url.find('success') != -1:
+            # logged
+            if url.find('srun_portal') != -1 and url.find('success') != -1 and self.is_login():
                 return True
             else:
                 return False
+        else:
+            return False
+
+    def logout(self):
+        self.firefox.get(self.cfg['portal_url'] + '&wlanuserip=' + self.internal_ip)
+        time.sleep(1)
+        url = self.firefox.current_url
+        if url.find('srun_portal') != -1 and url.find('success') != -1:
+            self.firefox.find_element(By.ID, "logout").click()
+            self.firefox.find_element(By.CSS_SELECTOR, ".btn-confirm").click()
+            time.sleep(1)
+            url = self.firefox.current_url
+            if url.find('srun_portal') != -1 and url.find('success') == -1:
+                return True
+            else:
+                return False
+        else:
+            return False
+
+    def info(self):
+        # get user info in portal page span elements
+        self.firefox.get(self.cfg['portal_url'] + '&wlanuserip=' + self.internal_ip)
+        time.sleep(0.5)
+        username = self.firefox.find_element(By.ID, "username").text
+        used_flow = self.firefox.find_element(By.ID, "used-flow").text
+        used_time = self.firefox.find_element(By.ID, "used-time").text
+        balance = self.firefox.find_element(By.ID, "balance").text
+        ip = self.firefox.find_element(By.ID, "ipv4").text
+        ret = PrettyTable()
+        ret.field_names = ["Srun AutoLogin", "@564568e"]
+        ret.add_row(['Username', username])
+        ret.add_row(['Used Flow', used_flow])
+        ret.add_row(['Used Time', used_time])
+        ret.add_row(['Balance', balance])
+        ret.add_row(['IP', ip])
+        return ret
+
+    def is_login(self):
+        # return True if logged in and network is connected
+        self.firefox.get('http://qq.com')
+        time.sleep(1)
+        url = self.firefox.current_url
+        if url.find('qq.com') != -1:
+            return True
+        else:
+            return False
+
+    def quit(self):
+        self.firefox.quit()
 
 
 if __name__ == '__main__':
+    print("Srun AutoLogin - Firefox ver")
+    print("Initializing...")
     srun = SrunFireFox(debug=True)
-    srun.login()
+    if srun.is_login():
+        print(srun.info())
+        print('Already logged in, type Y to logout')
+        i = input()
+        if i.lower() == 'y':
+            if srun.logout():
+                print('logout success')
+            else:
+                print('!!! logout failed')
+    else:
+        print('Not logged in, type Y to login')
+        i = input()
+        if i.lower() == 'y':
+            if srun.login():
+                print('login success')
+            else:
+                print('!!! login failed')
+    srun.quit()
+
