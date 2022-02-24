@@ -2,6 +2,7 @@
     "username" : "123456",
     "password" : "123456",
     "portal_url" : "http://1.1.1.1/",
+    "auto_login" : "true",
     "ua_type" : "mobile",
     "gecko_driver" : "geckodriver",
     "gecko_path" : "firefox"

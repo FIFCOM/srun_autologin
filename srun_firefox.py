@@ -65,7 +65,6 @@ class SrunFireFox:
         # get url
         time.sleep(1)
         url = self.firefox.current_url
-        print(url)
         # not logged in
         if url.find('srun_portal') != -1 and url.find('success') == -1:
             self.firefox.find_element(By.ID, "username").send_keys(self.cfg['username'])
@@ -108,7 +107,7 @@ class SrunFireFox:
         balance = self.firefox.find_element(By.ID, "balance").text
         ip = self.firefox.find_element(By.ID, "ipv4").text
         ret = PrettyTable()
-        ret.field_names = ["Srun AutoLogin", "@564568e"]
+        ret.field_names = ["Srun AutoLogin", "@cbfa572"]
         ret.add_row(['Username', username])
         ret.add_row(['Used Flow', used_flow])
         ret.add_row(['Used Time', used_time])
@@ -126,6 +125,12 @@ class SrunFireFox:
         else:
             return False
 
+    def auto_login(self):
+        if self.cfg['auto_login'] == 'true':
+            return True
+        else:
+            return False
+
     def quit(self):
         self.firefox.quit()
 
@@ -136,20 +141,27 @@ if __name__ == '__main__':
     srun = SrunFireFox(debug=True)
     if srun.is_login():
         print(srun.info())
-        print('Already logged in, type Y to logout')
-        i = input()
+        i = input('Already logged in, type Y to logout: ')
         if i.lower() == 'y':
+            print('Logging out...')
             if srun.logout():
                 print('logout success')
             else:
                 print('!!! logout failed')
     else:
-        print('Not logged in, type Y to login')
-        i = input()
-        if i.lower() == 'y':
+        if srun.auto_login():
+            print()
             if srun.login():
                 print('login success')
             else:
                 print('!!! login failed')
+        else:
+            i = input('Not logged in, type Y to login: ')
+            if i.lower() == 'y':
+                print('Logging in...')
+                if srun.login():
+                    print('login success')
+                else:
+                    print('!!! login failed')
     srun.quit()
 
