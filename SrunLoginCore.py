@@ -18,7 +18,7 @@ class SrunLoginCore:
         acid = "1",
         enc = "srun_bx1",
         debug = False
-	):
+    ):
         self.UA = {'User-Agent':'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/111.0.0.0 Safari/537.36'}
         self.url_portal = url_portal
         self.url_login_api = url_login_api
